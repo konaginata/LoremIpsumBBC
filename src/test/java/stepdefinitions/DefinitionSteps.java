@@ -12,7 +12,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import pages.FeedPage;
 import pages.HomePage;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import static io.github.bonigarcia.wdm.WebDriverManager.chromedriver;
 import static org.junit.Assert.*;
@@ -28,7 +28,7 @@ public class DefinitionSteps {
     public void setupClass() {
         chromedriver().setup();
         driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(100));
         driver.manage().window().maximize();
         pageFactoryManager = new PageFactoryManager(driver);
     }
@@ -105,5 +105,26 @@ public class DefinitionSteps {
     @Then("User checks the first paragraph does not start with {string}")
     public void userChecksTheFirstParagraphDoesNotStartWithText(final String text) {
         assertFalse(feedPage.getFirstParagraphText().startsWith(text));
+    }
+
+    @And("User gets text from each paragraph and determines the number of paragraphs containing {string}")
+    public long userGetsTextFromEachParagraphAndDeterminesTheNumberOfParagraphsContainingWord(final String text) {
+        return feedPage.getListOfParagraphs().stream().filter(i -> i.getText().contains(text)).count();
+    }
+
+    @And("User runs the generation 10 times and gets the average number of paragraphs containing {string}")
+    public int userRunsTheGeneration10TimesAndGetsTheAverageNumberOfParagraphsContainingWord(final String text) {
+        long count = userGetsTextFromEachParagraphAndDeterminesTheNumberOfParagraphsContainingWord(text);
+        for (int i = 0; i < 10; i++) {
+            driver.navigate().refresh();
+            count += userGetsTextFromEachParagraphAndDeterminesTheNumberOfParagraphsContainingWord(text);
+        }
+        return (int) count / 11;
+    }
+
+    @Then("User checks the value is not less than 2")
+    public void userChecksTheValueIsNotLessThan2() {
+        assertTrue(userRunsTheGeneration10TimesAndGetsTheAverageNumberOfParagraphsContainingWord("lorem")
+                >= 2);
     }
 }

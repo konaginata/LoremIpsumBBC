@@ -47,3 +47,15 @@ Feature: loremIpsum
     Examples:
       | homePage            | text        |
       | https://lipsum.com/ | Lorem ipsum |
+
+  Scenario Outline: Check that randomly generated text paragraphs contain the word "lorem" with probability of more
+  than 40%
+    Given User opens '<homePage>' page
+    When User clicks Generate button
+    And User gets text from each paragraph and determines the number of paragraphs containing '<word>'
+    And User runs the generation 10 times and gets the average number of paragraphs containing '<word>'
+    Then User checks the value is not less than 2
+
+    Examples:
+      | homePage            | word  |
+      | https://lipsum.com/ | lorem |
