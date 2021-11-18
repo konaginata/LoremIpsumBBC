@@ -108,23 +108,22 @@ public class DefinitionSteps {
     }
 
     @And("User gets text from each paragraph and determines the number of paragraphs containing {string}")
-    public long userGetsTextFromEachParagraphAndDeterminesTheNumberOfParagraphsContainingWord(final String text) {
+    public long userDeterminesTheNumberOfParagraphsContainingWord(final String text) {
         return feedPage.getListOfParagraphs().stream().filter(i -> i.getText().contains(text)).count();
     }
 
     @And("User runs the generation 10 times and gets the average number of paragraphs containing {string}")
-    public int userRunsTheGeneration10TimesAndGetsTheAverageNumberOfParagraphsContainingWord(final String text) {
-        long count = userGetsTextFromEachParagraphAndDeterminesTheNumberOfParagraphsContainingWord(text);
+    public int userGetsTheAverageNumberOfParagraphsContainingWord(final String text) {
+        long count = 0;
         for (int i = 0; i < 10; i++) {
             driver.navigate().refresh();
-            count += userGetsTextFromEachParagraphAndDeterminesTheNumberOfParagraphsContainingWord(text);
+            count += userDeterminesTheNumberOfParagraphsContainingWord(text);
         }
-        return (int) count / 11;
+        return (int) count / 10;
     }
 
     @Then("User checks the value is not less than 2")
     public void userChecksTheValueIsNotLessThan2() {
-        assertTrue(userRunsTheGeneration10TimesAndGetsTheAverageNumberOfParagraphsContainingWord("lorem")
-                >= 2);
+        assertTrue(userGetsTheAverageNumberOfParagraphsContainingWord("lorem") >= 2);
     }
 }
