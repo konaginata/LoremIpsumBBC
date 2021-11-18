@@ -13,6 +13,7 @@ import pages.FeedPage;
 import pages.HomePage;
 
 import java.time.Duration;
+import java.util.NoSuchElementException;
 
 import static io.github.bonigarcia.wdm.WebDriverManager.chromedriver;
 import static org.junit.Assert.*;
@@ -104,7 +105,8 @@ public class DefinitionSteps {
 
     @Then("User checks the first paragraph does not start with {string}")
     public void userChecksTheFirstParagraphDoesNotStartWithText(final String text) {
-        assertFalse(feedPage.getFirstParagraphText().startsWith(text));
+        assertFalse(feedPage.getListOfParagraphs().stream().findFirst().orElseThrow(NoSuchElementException::new)
+                .getText().startsWith(text));
     }
 
     @And("User gets text from each paragraph and determines the number of paragraphs containing {string}")
